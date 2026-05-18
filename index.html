@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClinicaPro — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2330;
+    --accent: #3b82f6;
+    --accent2: #6366f1;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e8eaf0;
+    --text2: #7c8599;
+    --text3: #4a5168;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 220px;
+    min-height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    padding: 0 20px 28px;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .logo span { color: var(--accent); }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 20px;
+    cursor: pointer;
+    border-radius: 0;
+    color: var(--text2);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--accent); background: rgba(59,130,246,0.08); border-left-color: var(--accent); }
+
+  .nav-icon { font-size: 17px; }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .user-name { font-size: 13px; font-weight: 500; }
+  .user-role { font-size: 11px; color: var(--text2); }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    padding: 32px;
+    max-width: 100%;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; animation: fadeIn 0.25s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .page-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+  /* ── CARDS ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: #2a3048; }
+
+  .card-label { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .card-value { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; }
+  .card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(16,185,129,0.12);
+    color: var(--green);
+  }
+
+  /* ── TABLE ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    padding: 12px 22px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text3);
+    font-weight: 600;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody td { padding: 14px 22px; font-size: 14px; border-bottom: 1px solid rgba(30,35,48,0.5); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .badge-green { background: rgba(16,185,129,0.12); color: var(--green); }
+  .badge-yellow { background: rgba(245,158,11,0.12); color: var(--yellow); }
+  .badge-red { background: rgba(239,68,68,0.12); color: var(--red); }
+  .badge-blue { background: rgba(59,130,246,0.12); color: var(--accent); }
+
+  /* ── BUTTON ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+  .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); border-color: #2a3048; }
+  .btn-danger { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .btn-sm { padding: 6px 11px; font-size: 12px; }
+
+  /* ── SEARCH ── */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 9px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.15s;
+    outline: none;
+    width: 100%;
+  }
+
+  .input:focus { border-color: var(--accent); }
+  .input::placeholder { color: var(--text3); }
+
+  /* ── MODAL ── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    width: 440px;
+    max-width: 95vw;
+    animation: modalIn 0.2s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-head {
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
+  .modal-close {
+    background: none; border: none; color: var(--text2);
+    font-size: 20px; cursor: pointer; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body { padding: 22px 24px; }
+  .modal-body .input { margin-bottom: 12px; }
+
+  .form-label { font-size: 12px; color: var(--text2); margin-bottom: 5px; display: block; }
+
+  .form-group { margin-bottom: 14px; }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* ── CHARTS ── */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .mini-chart {
+    height: 80px;
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    padding: 0 4px;
+  }
+
+  .bar {
+    flex: 1;
+    background: var(--accent);
+    border-radius: 4px 4px 0 0;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+  .bar:hover { opacity: 1; }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text2);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; }
+
+  /* ── NOTIFICATION ── */
+  #toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--text);
+    z-index: 999;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    animation: slideUp 0.2s ease;
+  }
+  #toast.show { display: flex; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .logo, .nav-item span, .user-name, .user-role { display: none; }
+    .nav-item { justify-content: center; padding: 14px; }
+    .main { margin-left: 60px; padding: 20px; }
+    .cards-grid { grid-template-columns: 1fr 1fr; }
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    table { font-size: 13px; }
+    thead th, tbody td { padding: 10px 14px; }
+  }
+
+  select.input { appearance: none; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">Clínica<span>Pro</span></div>
+  <nav>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="nav-icon">📊</span><span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pacientes')">
+      <span class="nav-icon">👥</span><span>Pacientes</span>
+    </div>
+    <div class="nav-item" onclick="showPage('agendamentos')">
+      <span class="nav-icon">📅</span><span>Agendamentos</span>
+    </div>
+    <div class="nav-item" onclick="showPage('relatorios')">
+      <span class="nav-icon">📈</span><span>Relatórios</span>
+    </div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-info">
+      <div class="avatar">Dr</div>
+      <div>
+        <div class="user-name">Dr. Admin</div>
+        <div class="user-role">Administrador</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ── DASHBOARD ── -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Visão geral da clínica</div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-label">Total de pacientes</div>
+        <div class="card-value" id="stat-pacientes">0</div>
+        <div class="card-badge">👥 cadastrados</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Agendamentos hoje</div>
+        <div class="card-value" id="stat-hoje">0</div>
+        <div class="card-badge" style="background:rgba(245,158,11,.12);color:var(--yellow)">📅 hoje</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Confirmados</div>
+        <div class="card-value" id="stat-confirmados">0</div>
+        <div class="card-badge">✅ confirmados</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Pendentes</div>
+        <div class="card-value" id="stat-pendentes">0</div>
+        <div class="card-badge" style="background:rgba(239,68,68,.12);color:var(--red)">⏳ aguardando</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Agendamentos — semana</div>
+        </div>
+        <div style="padding:16px 22px;">
+          <div class="mini-chart" id="chart-semana"></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 4px 0;font-size:11px;color:var(--text3)">
+            <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-head"><div class="section-title">Próximos agendamentos</div></div>
+        <div id="dash-proximos" style="padding:8px 0;"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><div class="section-title">Pacientes recentes</div></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th><th>Telefone</th><th>Convênio</th><th>Cadastro</th>
+          </tr>
+        </thead>
+        <tbody id="dash-pacientes-recentes"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── PACIENTES ── -->
+  <div id="page-pacientes" class="page">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Pacientes</div>
+        <div class="page-sub" id="sub-pacientes">0 pacientes cadastrados</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-paciente')">＋ Novo paciente</button>
+    </div>
+
+    <div class="search-bar">
+      <input class="input" placeholder="🔍  Buscar por nome ou telefone..." id="search-paciente" oninput="renderPacientes()">
+    </div>
+
+    <div class="section">
+      <table>
+        <thead>
+          <tr><th>Nome</th><th>Telefone</th><th>Email</th><th>Convênio</th><th>Cadastro</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="tabela-pacientes"></tbody>
+      </table>
+      <div id="empty-pacientes" class="empty" style="display:none">
+        <div class="empty-icon">👥</div>
+        <div class="empty-text">Nenhum paciente encontrado</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AGENDAMENTOS ── -->
+  <div id="page-agendamentos" class="page">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Agendamentos</div>
+        <div class="page-sub" id="sub-agenda">0 agendamentos</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-agenda')">＋ Novo agendamento</button>
+    </div>
+
+    <div class="search-bar">
+      <input class="input" placeholder="🔍  Buscar por paciente..." id="search-agenda" oninput="renderAgendamentos()" style="max-width:280px">
+      <select class="input" id="filter-status" onchange="renderAgendamentos()" style="max-width:180px">
+        <option value="">Todos os status</option>
+        <option value="Confirmado">Confirmado</option>
+        <option value="Pendente">Pendente</option>
+        <option value="Cancelado">Cancelado</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <table>
+        <thead>
+          <tr><th>Paciente</th><th>Data</th><th>Hora</th><th>Tipo</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="tabela-agendamentos"></tbody>
+      </table>
+      <div id="empty-agenda" class="empty" style="display:none">
+        <div class="empty-icon">📅</div>
+        <div class="empty-text">Nenhum agendamento encontrado</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RELATÓRIOS ── -->
+  <div id="page-relatorios" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Relatórios</div><div class="page-sub">Estatísticas gerais</div></div>
+    </div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-label">Total de consultas</div>
+        <div class="card-value" id="rel-total">0</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Taxa confirmação</div>
+        <div class="card-value" id="rel-taxa">0%</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Cancelamentos</div>
+        <div class="card-value" id="rel-cancel">0</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Novos pacientes (mês)</div>
+        <div class="card-value" id="rel-novos">0</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-head"><div class="section-title">Agendamentos por tipo</div></div>
+      <div id="rel-chart" style="padding:20px 22px;"></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><div class="section-title">Histórico completo</div></div>
+      <table>
+        <thead><tr><th>Paciente</th><th>Data</th><th>Tipo</th><th>Status</th></tr></thead>
+        <tbody id="tabela-historico"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Modal Paciente -->
+<div class="overlay" id="modal-paciente">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-paciente-title">Novo paciente</div>
+      <button class="modal-close" onclick="closeModal('modal-paciente')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pac-id">
+      <div class="form-group">
+        <label class="form-label">Nome completo *</label>
+        <input class="input" id="pac-nome" placeholder="Ex: João da Silva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone *</label>
+        <input class="input" id="pac-tel" placeholder="(11) 99999-9999">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="input" id="pac-email" placeholder="email@exemplo.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Convênio</label>
+        <select class="input" id="pac-convenio">
+          <option value="Particular">Particular</option>
+          <option value="Unimed">Unimed</option>
+          <option value="Bradesco Saúde">Bradesco Saúde</option>
+          <option value="Amil">Amil</option>
+          <option value="SulAmérica">SulAmérica</option>
+          <option value="Outros">Outros</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-paciente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPaciente()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Agendamento -->
+<div class="overlay" id="modal-agenda">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-agenda-title">Novo agendamento</div>
+      <button class="modal-close" onclick="closeModal('modal-agenda')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ag-id">
+      <div class="form-group">
+        <label class="form-label">Paciente *</label>
+        <select class="input" id="ag-paciente"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data *</label>
+        <input class="input" type="date" id="ag-data">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hora *</label>
+        <input class="input" type="time" id="ag-hora">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de consulta</label>
+        <select class="input" id="ag-tipo">
+          <option>Consulta geral</option>
+          <option>Retorno</option>
+          <option>Exame</option>
+          <option>Procedimento</option>
+          <option>Emergência</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="input" id="ag-status">
+          <option>Pendente</option>
+          <option>Confirmado</option>
+          <option>Cancelado</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-agenda')">C
