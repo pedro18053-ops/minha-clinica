@@ -92,3 +92,165 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 select.input{appearance:none}
 </style>
 </head>
+<body>
+<div id="login-screen">
+  <div class="login-logo">Clínica<span>Pro</span></div>
+  <div class="login-sub">Sistema de gestão clínica</div>
+  <div class="login-card">
+    <div class="login-title">Bem-vindo 👋</div>
+    <div class="login-hint">Entre com suas credenciais</div>
+    <div class="form-group">
+      <label class="form-label">Usuário</label>
+      <input class="input" id="login-user" placeholder="admin">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Senha</label>
+      <input class="input" type="password" id="login-pass" placeholder="••••••••">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="login-error">Usuário ou senha incorretos</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:16px;text-align:center">Demo: admin / 1234</div>
+  </div>
+</div>
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">Clínica<span>Pro</span></div>
+    <div class="topbar-right">
+      <button class="logout-btn" onclick="doLogout()">Sair</button>
+      <div class="avatar">Dr</div>
+    </div>
+  </div>
+  <div id="page-dashboard" class="page active">
+    <div class="page-header">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="dash-date"></div>
+    </div>
+    <div class="cards-grid">
+      <div class="card card-blue"><div class="card-icon">👥</div><div class="card-label">Pacientes</div><div class="card-value" id="stat-pac">0</div></div>
+      <div class="card card-yellow"><div class="card-icon">📅</div><div class="card-label">Hoje</div><div class="card-value" id="stat-hoje">0</div></div>
+      <div class="card card-green"><div class="card-icon">✅</div><div class="card-label">Confirmados</div><div class="card-value" id="stat-conf">0</div></div>
+      <div class="card card-red"><div class="card-icon">⏳</div><div class="card-label">Pendentes</div><div class="card-value" id="stat-pend">0</div></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><div class="section-title">📊 Semana</div></div>
+      <div class="chart-wrap">
+        <div class="bars" id="chart-bars"></div>
+        <div class="bar-labels"><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-head"><div class="section-title">🗓 Próximos</div></div>
+      <div id="dash-proximos"></div>
+    </div>
+  </div>
+  <div id="page-pacientes" class="page">
+    <div class="page-header">
+      <div class="page-title">Pacientes</div>
+      <div class="page-sub" id="sub-pac"></div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="search-pac" placeholder="Buscar paciente..." oninput="renderPacientes()">
+    </div>
+    <div id="lista-pacientes"></div>
+  </div>
+  <div id="page-agenda" class="page">
+    <div class="page-header">
+      <div class="page-title">Agendamentos</div>
+      <div class="page-sub" id="sub-ag"></div>
+    </div>
+    <div class="filter-row">
+      <div class="filter-chip active" onclick="setFilter('')" data-val="">Todos</div>
+      <div class="filter-chip" onclick="setFilter('Confirmado')" data-val="Confirmado">Confirmados</div>
+      <div class="filter-chip" onclick="setFilter('Pendente')" data-val="Pendente">Pendentes</div>
+      <div class="filter-chip" onclick="setFilter('Cancelado')" data-val="Cancelado">Cancelados</div>
+    </div>
+    <div id="lista-agenda"></div>
+  </div>
+  <div id="page-relatorios" class="page">
+    <div class="page-header">
+      <div class="page-title">Relatórios</div>
+      <div class="page-sub">Estatísticas gerais</div>
+    </div>
+    <div class="cards-grid">
+      <div class="card card-blue"><div class="card-icon">📋</div><div class="card-label">Total</div><div class="card-value" id="rel-total">0</div></div>
+      <div class="card card-green"><div class="card-icon">📈</div><div class="card-label">Taxa conf.</div><div class="card-value" id="rel-taxa">0%</div></div>
+      <div class="card card-red"><div class="card-icon">❌</div><div class="card-label">Cancelados</div><div class="card-value" id="rel-cancel">0</div></div>
+      <div class="card card-yellow"><div class="card-icon">🆕</div><div class="card-label">Novos/mês</div><div class="card-value" id="rel-novos">0</div></div>
+    </div>
+    <div class="section">
+      <div class="section-head"><div class="section-title">Por tipo</div></div>
+      <div id="rel-tipos" style="padding:16px 18px"></div>
+    </div>
+  </div>
+  <button class="fab" onclick="openFab()">＋</button>
+  <nav class="bottom-nav">
+    <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')"><span class="nav-icon">📊</span>Início</div>
+    <div class="nav-item" id="nav-pacientes" onclick="showPage('pacientes')"><span class="nav-icon">👥</span>Pacientes</div>
+    <div class="nav-item" id="nav-agenda" onclick="showPage('agenda')"><span class="nav-icon">📅</span>Agenda</div>
+    <div class="nav-item" id="nav-relatorios" onclick="showPage('relatorios')"><span class="nav-icon">📈</span>Relatórios</div>
+  </nav>
+</div>
+<div class="overlay" id="modal-pac">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><div class="modal-title" id="modal-pac-title">Novo paciente</div><button class="modal-close" onclick="closeModal('modal-pac')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="pac-id">
+      <div class="form-group"><label class="form-label">Nome *</label><input class="input" id="pac-nome" placeholder="Nome completo"></div>
+      <div class="form-group"><label class="form-label">Telefone *</label><input class="input" id="pac-tel" placeholder="(11) 99999-9999" type="tel"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="input" id="pac-email" placeholder="email@exemplo.com" type="email"></div>
+      <div class="form-group"><label class="form-label">Convênio</label><select class="input" id="pac-conv"><option>Particular</option><option>Unimed</option><option>Bradesco Saúde</option><option>Amil</option><option>Outros</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-pac')">Cancelar</button><button class="btn btn-primary" onclick="salvarPac()">Salvar</button></div>
+  </div>
+</div>
+<div class="overlay" id="modal-ag">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><div class="modal-title" id="modal-ag-title">Novo agendamento</div><button class="modal-close" onclick="closeModal('modal-ag')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ag-id">
+      <div class="form-group"><label class="form-label">Paciente *</label><select class="input" id="ag-pac"></select></div>
+      <div class="form-group"><label class="form-label">Data *</label><input class="input" type="date" id="ag-data"></div>
+      <div class="form-group"><label class="form-label">Hora *</label><input class="input" type="time" id="ag-hora"></div>
+      <div class="form-group"><label class="form-label">Tipo</label><select class="input" id="ag-tipo"><option>Consulta geral</option><option>Retorno</option><option>Exame</option><option>Procedimento</option><option>Emergência</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="input" id="ag-status"><option>Pendente</option><option>Confirmado</option><option>Cancelado</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-ag')">Cancelar</button><button class="btn btn-primary" onclick="salvarAg()">Salvar</button></div>
+  </div>
+</div>
+<div id="toast"><span id="t-icon">✅</span><span id="t-msg">Salvo!</span></div>
+<script>
+let pacs=JSON.parse(localStorage.getItem('cp_pacs')||'[]');
+let ags=JSON.parse(localStorage.getItem('cp_ags')||'[]');
+let pid=parseInt(localStorage.getItem('cp_pid')||'1');
+let aid=parseInt(localStorage.getItem('cp_aid')||'1');
+let agFilter='';
+let currentPage='dashboard';
+function save(){localStorage.setItem('cp_pacs',JSON.stringify(pacs));localStorage.setItem('cp_ags',JSON.stringify(ags));localStorage.setItem('cp_pid',pid);localStorage.setItem('cp_aid',aid)}
+function doLogin(){var u=document.getElementById('login-user').value.trim();var p=document.getElementById('login-pass').value;if(u==='admin'&&p==='1234'){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';renderDashboard()}else{document.getElementById('login-error').style.display='block'}}
+document.addEventListener('DOMContentLoaded',function(){var lp=document.getElementById('login-pass');if(lp)lp.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()})});
+function doLogout(){document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-user').value='';document.getElementById('login-pass').value='';document.getElementById('login-error').style.display='none'}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');document.getElementById('nav-'+id).classList.add('active');currentPage=id;if(id==='dashboard')renderDashboard();if(id==='pacientes')renderPacientes();if(id==='agenda')renderAgenda();if(id==='relatorios')renderRelatorios()}
+function openFab(){if(currentPage==='pacientes'){document.getElementById('modal-pac-title').textContent='Novo paciente';clearForms();openModal('modal-pac')}else{populatePacSel();document.getElementById('modal-ag-title').textContent='Novo agendamento';clearForms();openModal('modal-ag')}}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===o)closeModal(o.id)})})});
+function clearForms(){['pac-id','pac-nome','pac-tel','pac-email','ag-id','ag-data','ag-hora'].forEach(id=>{var el=document.getElementById(id);if(el)el.value=''});var c=document.getElementById('pac-conv');if(c)c.value='Particular';var t=document.getElementById('ag-tipo');if(t)t.value='Consulta geral';var s=document.getElementById('ag-status');if(s)s.value='Pendente'}
+let toastTimer;
+function toast(msg,icon){icon=icon||'✅';clearTimeout(toastTimer);document.getElementById('t-msg').textContent=msg;document.getElementById('t-icon').textContent=icon;document.getElementById('toast').classList.add('show');toastTimer=setTimeout(function(){document.getElementById('toast').classList.remove('show')},2500)}
+function salvarPac(){var nome=document.getElementById('pac-nome').value.trim();var tel=document.getElementById('pac-tel').value.trim();if(!nome||!tel){toast('Preencha nome e telefone!','⚠️');return}var id=document.getElementById('pac-id').value;var d={nome:nome,tel:tel,email:document.getElementById('pac-email').value.trim(),conv:document.getElementById('pac-conv').value,data:new Date().toLocaleDateString('pt-BR')};if(id){var i=pacs.findIndex(function(p){return p.id==id});pacs[i]=Object.assign({},pacs[i],d);toast('Paciente atualizado!')}else{pacs.push(Object.assign({id:pid++},d));toast('Paciente cadastrado!')}save();closeModal('modal-pac');renderPacientes();renderDashboard()}
+function editPac(id){var p=pacs.find(function(x){return x.id===id});document.getElementById('modal-pac-title').textContent='Editar paciente';document.getElementById('pac-id').value=id;document.getElementById('pac-nome').value=p.nome;document.getElementById('pac-tel').value=p.tel;document.getElementById('pac-email').value=p.email||'';document.getElementById('pac-conv').value=p.conv||'Particular';openModal('modal-pac')}
+function delPac(id){if(!confirm('Deletar paciente?'))return;pacs=pacs.filter(function(p){return p.id!==id});ags=ags.filter(function(a){return a.pacId!==id});save();renderPacientes();renderDashboard();toast('Removido','🗑️')}
+function renderPacientes(){var q=(document.getElementById('search-pac').value||'').toLowerCase();var lista=pacs.filter(function(p){return p.nome.toLowerCase().includes(q)||p.tel.includes(q)});document.getElementById('sub-pac').textContent=pacs.length+' paciente'+(pacs.length!==1?'s':'')+' cadastrado'+(pacs.length!==1?'s':'');var el=document.getElementById('lista-pacientes');if(lista.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">'+(pacs.length===0?'Nenhum paciente cadastrado':'Nenhum resultado')+'</div></div>';return}el.innerHTML='<div class="section">'+lista.map(function(p){return'<div class="list-item"><div style="flex:1;min-width:0"><div class="list-name">'+p.nome+'</div><div class="list-sub">'+p.tel+' · <span class="badge badge-blue">'+(p.conv||'Particular')+'</span></div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn btn-ghost btn-sm" onclick="editPac('+p.id+')">✏️</button><button class="btn btn-danger btn-sm" onclick="delPac('+p.id+')">🗑️</button></div></div>'}).join('')+'</div>'}
+function populatePacSel(){var sel=document.getElementById('ag-pac');sel.innerHTML=pacs.length===0?'<option>Cadastre um paciente primeiro</option>':pacs.map(function(p){return'<option value="'+p.id+'">'+p.nome+'</option>'}).join('')}
+function salvarAg(){var pacId=parseInt(document.getElementById('ag-pac').value);var data=document.getElementById('ag-data').value;var hora=document.getElementById('ag-hora').value;if(!data||!hora){toast('Preencha data e hora!','⚠️');return}var pac=pacs.find(function(p){return p.id===pacId});if(!pac){toast('Selecione um paciente!','⚠️');return}var id=document.getElementById('ag-id').value;var d={pacId:pacId,pacNome:pac.nome,data:data,hora:hora,tipo:document.getElementById('ag-tipo').value,status:document.getElementById('ag-status').value};if(id){var i=ags.findIndex(function(a){return a.id==id});ags[i]=Object.assign({},ags[i],d);toast('Atualizado!')}else{ags.push(Object.assign({id:aid++},d));toast('Agendamento criado!')}save();closeModal('modal-ag');renderAgenda();renderDashboard()}
+function editAg(id){var a=ags.find(function(x){return x.id===id});document.getElementById('modal-ag-title').textContent='Editar agendamento';document.getElementById('ag-id').value=id;populatePacSel();document.getElementById('ag-pac').value=a.pacId;document.getElementById('ag-data').value=a.data;document.getElementById('ag-hora').value=a.hora;document.getElementById('ag-tipo').value=a.tipo;document.getElementById('ag-status').value=a.status;openModal('modal-ag')}
+function delAg(id){if(!confirm('Deletar agendamento?'))return;ags=ags.filter(function(a){return a.id!==id});save();renderAgenda();renderDashboard();toast('Removido','🗑️')}
+function setFilter(v){agFilter=v;document.querySelectorAll('.filter-chip').forEach(function(c){c.classList.toggle('active',c.dataset.val===v)});renderAgenda()}
+function statusBadge(s){if(s==='Confirmado')return'badge-green';if(s==='Pendente')return'badge-yellow';return'badge-red'}
+function fmtData(d){var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function renderAgenda(){var lista=ags.filter(function(a){return!agFilter||a.status===agFilter}).sort(function(a,b){return(a.data+a.hora).localeCompare(b.data+b.hora)});document.getElementById('sub-ag').textContent=ags.length+' agendamento'+(ags.length!==1?'s':'');var el=document.getElementById('lista-agenda');if(lista.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">📅</div><div class="empty-text">Nenhum agendamento encontrado</div></div>';return}el.innerHTML='<div class="section">'+lista.map(function(a){return'<div class="list-item"><div style="flex:1;min-width:0"><div class="list-name">'+a.pacNome+'</div><div class="list-sub">'+fmtData(a.data)+' · '+a.hora+' · '+a.tipo+'</div><div style="margin-top:4px"><span class="badge '+statusBadge(a.status)+'">'+a.status+'</span></div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn btn-ghost btn-sm" onclick="editAg('+a.id+')">✏️</button><button class="btn btn-danger btn-sm" onclick="delAg('+a.id+')">🗑️</button></div></div>'}).join('')+'</div>'}
+function renderDashboard(){var hoje=new Date().toISOString().split('T')[0];document.getElementById('stat-pac').textContent=pacs.length;document.getElementById('stat-hoje').textContent=ags.filter(function(a){return a.data===hoje}).length;document.getElementById('stat-conf').textContent=ags.filter(function(a){return a.status==='Confirmado'}).length;document.getElementById('stat-pend').textContent=ags.filter(function(a){return a.status==='Pendente'}).length;var now=new Date();document.getElementById('dash-date').textContent=now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});var dias=[];for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);dias.push(d.toISOString().split('T')[0])}var counts=dias.map(function(d){return ags.filter(function(a){return a.data===d}).length});var maxV=Math.max.apply(null,counts.concat([1]));document.getElementById('chart-bars').innerHTML=counts.map(function(c){return'<div class="bar" style="height:'+Math.max(c/maxV*72,4)+'px"></div>'}).join('');var prox=ags.filter(function(a){return a.data>=hoje&&a.status!=='Cancelado'}).sort(function(a,b){return(a.data+a.hora).localeCompare(b.data+b.hora)}).slice(0,4);var pEl=document.getElementById('dash-proximos');pEl.innerHTML=prox.length===0?'<div class="empty" style="padding:24px"><div class="empty-text">Sem próximos agendamentos</div></div>':prox.map(function(a){return'<div class="list-item"><div style="flex:1"><div class="list-name">'+a.pacNome+'</div><div class="list-sub">'+fmtData(a.data)+' · '+a.hora+' · '+a.tipo+'</div></div><span class="badge '+statusBadge(a.status)+'">'+a.status+'</span></div>'}).join('')}
+function renderRelatorios(){var total=ags.length;var conf=ags.filter(function(a){return a.status==='Confirmado'}).length;var cancel=ags.filter(function(a){return a.status==='Cancelado'}).length;var mes=new Date().getMonth(),ano=new Date().getFullYear();var novos=pacs.filter(function(p){var parts=p.data.split('/');return parseInt(parts[1])-1===mes&&parseInt(parts[2])===ano}).length;document.getElementById('rel-total').text
