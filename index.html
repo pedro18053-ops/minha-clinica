@@ -353,7 +353,7 @@ select.input{appearance:none}
       <div class="topbar"><div><div class="pg-title">HORÁRIOS</div><div class="pg-sub">Disponibilidade do dia</div></div></div>
       <div class="painel">
         <div class="painel-head"><div class="painel-title">Grade de horários</div><span class="h-restantes" id="h-rest2"></span></div>
-        <div class="horarios-wra
+        <div class="horarios-wrap" id="horarios-grid"></div>
 _servs')||'[]');var pid=parseInt(localStorage.getItem('s7v2_pid')||'1');var aid=parseInt(localStorage.getItem('s7v2_aid')||'1');var sid=parseInt(localStorage.getItem('s7v2_sid')||'1');var agFilter='';var currentPage='dashboard';var HORAS=['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
 function save(){localStorage.setItem('s7v2_pacs',JSON.stringify(pacs));localStorage.setItem('s7v2_ags',JSON.stringify(ags));localStorage.setItem('s7v2_servs',JSON.stringify(servs));localStorage.setItem('s7v2_pid',pid);localStorage.setItem('s7v2_aid',aid);localStorage.setItem('s7v2_sid',sid)}
 function doLogin(){var u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;if(u==='admin'&&p==='1234'){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';renderDashboard()}else{document.getElementById('lerr').style.display='block'}}
